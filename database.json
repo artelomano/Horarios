@@ -1,0 +1,151 @@
+{
+  "employees": [
+    {
+      "id": 1,
+      "name": "Patricia",
+      "type": "internal",
+      "role": "Administradora",
+      "hoursPerWeek": 40,
+      "hoursStatus": 0,
+      "comments": "",
+      "color": "#B3D9FF"
+    },
+    {
+      "id": 2,
+      "name": "Desi",
+      "type": "internal",
+      "role": "Recepcionista",
+      "hoursPerWeek": 36,
+      "hoursStatus": 0,
+      "comments": "Hace SIEMPRE 36 horas a la semana. Si debe hacer un turno de 4.5h, le quedan 0.5h de crédito que recupera en turnos posteriores. Controlar el estado de horas.",
+      "color": "#FFF4B3"
+    },
+    {
+      "id": 3,
+      "name": "Lanny",
+      "type": "internal",
+      "role": "Higienista Dental",
+      "hoursPerWeek": 40,
+      "hoursStatus": 0,
+      "comments": "",
+      "color": "#B3E5B3"
+    },
+    {
+      "id": 4,
+      "name": "Maite",
+      "type": "internal",
+      "role": "Higienista",
+      "hoursPerWeek": 40,
+      "hoursStatus": 0,
+      "comments": "",
+      "color": "#FFD9B3"
+    },
+    {
+      "id": 5,
+      "name": "Sergio",
+      "type": "external",
+      "role": "Cirujano",
+      "hoursPerWeek": 0,
+      "hoursStatus": 0,
+      "comments": "",
+      "color": "#B3D9FF"
+    },
+    {
+      "id": 6,
+      "name": "Reme",
+      "type": "external",
+      "role": "General y Endodoncias",
+      "hoursPerWeek": 0,
+      "hoursStatus": 0,
+      "comments": "",
+      "color": "#B3E5B3"
+    },
+    {
+      "id": 7,
+      "name": "Gloria",
+      "type": "external",
+      "role": "General",
+      "hoursPerWeek": 0,
+      "hoursStatus": 0,
+      "comments": "Actualmente de baja",
+      "color": "#FFD9B3"
+    },
+    {
+      "id": 8,
+      "name": "Carmen",
+      "type": "external",
+      "role": "General",
+      "hoursPerWeek": 0,
+      "hoursStatus": 0,
+      "comments": "",
+      "color": "#E6CCFF"
+    },
+    {
+      "id": 9,
+      "name": "Elena",
+      "type": "external",
+      "role": "Ortodoncia",
+      "hoursPerWeek": 0,
+      "hoursStatus": 0,
+      "comments": "",
+      "color": "#FFB3D9"
+    },
+    {
+      "id": 10,
+      "name": "Bea",
+      "type": "external",
+      "role": "Prótesis y Periodoncia",
+      "hoursPerWeek": 0,
+      "hoursStatus": 0,
+      "comments": "",
+      "color": "#FFFFB3"
+    },
+    {
+      "id": 11,
+      "name": "Armando",
+      "type": "external",
+      "role": "Endodoncia",
+      "hoursPerWeek": 0,
+      "hoursStatus": 0,
+      "comments": "",
+      "color": "#B3FFE6"
+    },
+    {
+      "id": 12,
+      "name": "Natalia",
+      "type": "external",
+      "role": "General",
+      "hoursPerWeek": 0,
+      "hoursStatus": 0,
+      "comments": "",
+      "color": "#FFB3B3"
+    }
+  ],
+  "templates": [
+    {
+      "id": "template1",
+      "name": "Template 1",
+      "data": {
+        "monday": { "morning": [], "afternoon": [] },
+        "tuesday": { "morning": [], "afternoon": [] },
+        "wednesday": { "morning": [], "afternoon": [] },
+        "thursday": { "morning": [], "afternoon": [] },
+        "friday": { "morning": [], "afternoon": [] }
+      }
+    },
+    {
+      "id": "template2",
+      "name": "Template 2",
+      "data": {
+        "monday": { "morning": [], "afternoon": [] },
+        "tuesday": { "morning": [], "afternoon": [] },
+        "wednesday": { "morning": [], "afternoon": [] },
+        "thursday": { "morning": [], "afternoon": [] },
+        "friday": { "morning": [], "afternoon": [] }
+      }
+    }
+  ],
+  "schedules": {},
+  "vacations": {}
+}
+

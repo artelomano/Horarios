@@ -1,0 +1,27 @@
+{
+  "name": "horarios-patri",
+  "version": "1.0.0",
+  "description": "Sistema de gestión de horarios para clínica dental",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "horarios",
+    "schedule",
+    "dental",
+    "clinic"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
+
