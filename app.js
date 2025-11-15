@@ -116,27 +116,29 @@ const WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 const WEEKDAY_NAMES = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
 
 // Inicializar aplicación
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     console.log('Inicializando aplicación...');
-    loadEmployees();
-    loadTemplate();
-    loadSchedules();
-    loadVacations();
+    await loadEmployees();
+    await loadTemplate();
+    await loadSchedules();
+    await loadVacations();
     setupEventListeners();
     renderMonthlySchedule();
     console.log('Aplicación inicializada correctamente');
 });
 
 // Cargar empleados desde la base de datos
-function loadEmployees() {
+async function loadEmployees() {
     console.log('Cargando empleados desde la base de datos...');
     try {
-        const stored = localStorage.getItem('employees');
-        if (stored) {
-            employees = JSON.parse(stored);
+        const response = await fetch('/api/employees');
+        if (response.ok) {
+            employees = await response.json();
             // Asegurar que todos los empleados tengan color
+            let needsSave = false;
             employees.forEach(emp => {
                 if (!emp.color) {
+                    needsSave = true;
                     if (emp.type === 'internal') {
                         // Colores por defecto para internos
                         const defaultColors = {
@@ -152,16 +154,18 @@ function loadEmployees() {
                     }
                 }
             });
-            saveEmployees(); // Guardar colores si se añadieron
+            if (needsSave) {
+                await saveEmployees(); // Guardar colores si se añadieron
+            }
             console.log(`Cargados ${employees.length} empleados desde la base de datos`);
-        } else {
+        } else if (response.status === 404 || employees.length === 0) {
             // Inicializar con empleados por defecto
-            initializeDefaultEmployees();
+            await initializeDefaultEmployees();
             console.log('Inicializados con empleados por defecto');
         }
     } catch (error) {
         console.error('Error al cargar empleados:', error);
-        initializeDefaultEmployees();
+        await initializeDefaultEmployees();
     }
 }
 
@@ -186,7 +190,7 @@ function hslToHex(h, s, l) {
 }
 
 // Inicializar empleados por defecto
-function initializeDefaultEmployees() {
+async function initializeDefaultEmployees() {
     console.log('Inicializando empleados por defecto...');
     employees = [
         // Empleados internos (con colores pastel)
@@ -204,30 +208,41 @@ function initializeDefaultEmployees() {
         { id: 11, name: 'Armando', type: 'external', role: 'Endodoncia', hoursPerWeek: 0, hoursStatus: 0, comments: '', color: hslToHex(160, 50, 80) },
         { id: 12, name: 'Natalia', type: 'external', role: 'General', hoursPerWeek: 0, hoursStatus: 0, comments: '', color: hslToHex(10, 50, 80) }
     ];
-    saveEmployees();
+    await saveEmployees();
 }
 
 // Guardar empleados en la base de datos
-function saveEmployees() {
+async function saveEmployees() {
     console.log('Guardando empleados en la base de datos...');
     try {
-        localStorage.setItem('employees', JSON.stringify(employees));
-        console.log(`Guardados ${employees.length} empleados en la base de datos`);
+        const response = await fetch('/api/employees', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(employees)
+        });
+        if (response.ok) {
+            console.log(`Guardados ${employees.length} empleados en la base de datos`);
+        } else {
+            console.error('Error al guardar empleados:', await response.text());
+        }
     } catch (error) {
         console.error('Error al guardar empleados:', error);
     }
 }
 
 // Cargar templates semanales
-function loadTemplate() {
+async function loadTemplate() {
     console.log('Cargando templates semanales...');
     try {
-        const stored = localStorage.getItem('weeklyTemplates');
-        if (stored) {
-            const parsed = JSON.parse(stored);
+        const response = await fetch('/api/templates');
+        if (response.ok) {
+            const parsed = await response.json();
             
             // Migrar de estructura antigua a nueva
-            if (parsed.monday && !parsed.template1 && !Array.isArray(parsed)) {
+            if (parsed && parsed.length > 0) {
+                // Nueva estructura: array de templates
+                templates = parsed;
+            } else if (parsed && parsed.monday && !parsed.template1 && !Array.isArray(parsed)) {
                 // Estructura muy antigua: solo un template
                 console.log('Migrando estructura muy antigua de template...');
                 templates = [
@@ -240,7 +255,7 @@ function loadTemplate() {
                         friday: { morning: [], afternoon: [] }
                     }}
                 ];
-            } else if (parsed.template1 && !Array.isArray(parsed)) {
+            } else if (parsed && parsed.template1 && !Array.isArray(parsed)) {
                 // Estructura intermedia: objeto con template1 y template2
                 console.log('Migrando estructura intermedia de templates...');
                 templates = [
@@ -253,12 +268,9 @@ function loadTemplate() {
                         friday: { morning: [], afternoon: [] }
                     }}
                 ];
-            } else if (Array.isArray(parsed)) {
-                // Nueva estructura: array de templates
-                templates = parsed;
-        } else {
-                // Fallback: crear templates por defecto
-                console.log('Estructura desconocida, creando templates por defecto');
+            } else {
+                // Fallback: usar templates por defecto
+                console.log('No hay templates guardados, usando templates por defecto');
             }
             
             console.log('Templates semanales cargados');
@@ -275,23 +287,31 @@ function loadTemplate() {
 }
 
 // Guardar templates semanales
-function saveTemplate() {
+async function saveTemplate() {
     console.log('Guardando templates semanales...');
     try {
-        localStorage.setItem('weeklyTemplates', JSON.stringify(templates));
-        console.log('Templates semanales guardados');
+        const response = await fetch('/api/templates', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(templates)
+        });
+        if (response.ok) {
+            console.log('Templates semanales guardados');
+        } else {
+            console.error('Error al guardar templates:', await response.text());
+        }
     } catch (error) {
         console.error('Error al guardar templates:', error);
     }
 }
 
 // Cargar horarios mensuales
-function loadSchedules() {
+async function loadSchedules() {
     console.log('Cargando horarios mensuales...');
     try {
-        const stored = localStorage.getItem('monthlySchedules');
-        if (stored) {
-            schedules = JSON.parse(stored);
+        const response = await fetch('/api/schedules');
+        if (response.ok) {
+            schedules = await response.json();
             console.log('Horarios mensuales cargados');
         }
     } catch (error) {
@@ -300,23 +320,31 @@ function loadSchedules() {
 }
 
 // Guardar horarios mensuales
-function saveSchedules() {
+async function saveSchedules() {
     console.log('Guardando horarios mensuales...');
     try {
-        localStorage.setItem('monthlySchedules', JSON.stringify(schedules));
-        console.log('Horarios mensuales guardados');
+        const response = await fetch('/api/schedules', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(schedules)
+        });
+        if (response.ok) {
+            console.log('Horarios mensuales guardados');
+        } else {
+            console.error('Error al guardar horarios:', await response.text());
+        }
     } catch (error) {
         console.error('Error al guardar horarios:', error);
     }
 }
 
-// Cargar vacaciones desde localStorage
-function loadVacations() {
+// Cargar vacaciones desde servidor
+async function loadVacations() {
     console.log('Cargando vacaciones...');
     try {
-        const stored = localStorage.getItem('vacations');
-        if (stored) {
-            vacations = JSON.parse(stored);
+        const response = await fetch('/api/vacations');
+        if (response.ok) {
+            vacations = await response.json();
             console.log('Vacaciones cargadas correctamente');
         } else {
             vacations = {};
@@ -328,12 +356,20 @@ function loadVacations() {
     }
 }
 
-// Guardar vacaciones en localStorage
-function saveVacations() {
+// Guardar vacaciones en servidor
+async function saveVacations() {
     console.log('Guardando vacaciones...');
     try {
-        localStorage.setItem('vacations', JSON.stringify(vacations));
-        console.log('Vacaciones guardadas correctamente');
+        const response = await fetch('/api/vacations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(vacations)
+        });
+        if (response.ok) {
+            console.log('Vacaciones guardadas correctamente');
+        } else {
+            console.error('Error al guardar vacaciones:', await response.text());
+        }
     } catch (error) {
         console.error('Error al guardar vacaciones:', error);
     }
