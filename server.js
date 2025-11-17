@@ -3,20 +3,27 @@
  * Serves the React application and provides API endpoints
  */
 import express from 'express';
-import fs from 'fs/promises';
 import path from 'path';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import session from 'express-session';
 import { fileURLToPath } from 'url';
+import { initDatabase, closePool } from './database/postgres.js';
+import * as db from './database/db.js';
+import autoSetup from './scripts/autoSetup.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const DB_FILE = path.join(__dirname, 'database.json');
 const isProduction = process.env.NODE_ENV === 'production';
+
+// Initialize database connection and run auto-setup
+initDatabase();
+autoSetup().catch(err => {
+  console.error('Auto-setup error:', err);
+});
 
 // Middleware
 app.use(cors({
@@ -35,64 +42,7 @@ app.use(session({
     }
 }));
 
-// Read database
-async function readDatabase() {
-    try {
-        const data = await fs.readFile(DB_FILE, 'utf8');
-        return JSON.parse(data);
-    } catch (error) {
-        // If doesn't exist, create initial structure
-        console.log('Creating initial database.json...');
-        
-        // Encrypt default password
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash('123456', saltRounds);
-        
-        const initialData = {
-            users: [
-                {
-                    username: 'patricia',
-                    password: hashedPassword,
-                    role: 'admin'
-                }
-            ],
-            employees: [],
-            templates: [
-                { 
-                    id: 'template1', 
-                    name: 'Template 1',
-                    data: {
-                        monday: { morning: [], afternoon: [] },
-                        tuesday: { morning: [], afternoon: [] },
-                        wednesday: { morning: [], afternoon: [] },
-                        thursday: { morning: [], afternoon: [] },
-                        friday: { morning: [], afternoon: [] }
-                    }
-                },
-                { 
-                    id: 'template2', 
-                    name: 'Template 2',
-                    data: {
-                        monday: { morning: [], afternoon: [] },
-                        tuesday: { morning: [], afternoon: [] },
-                        wednesday: { morning: [], afternoon: [] },
-                        thursday: { morning: [], afternoon: [] },
-                        friday: { morning: [], afternoon: [] }
-                    }
-                }
-            ],
-            schedules: {},
-            vacations: {}
-        };
-        await fs.writeFile(DB_FILE, JSON.stringify(initialData, null, 2));
-        return initialData;
-    }
-}
-
-// Write database
-async function writeDatabase(data) {
-    await fs.writeFile(DB_FILE, JSON.stringify(data, null, 2));
-}
+// Database operations now use PostgreSQL via db.js module
 
 // Authentication middleware
 function requireAuth(req, res, next) {
@@ -118,9 +68,7 @@ app.post('/api/auth/login', async (req, res) => {
             return res.status(400).json({ error: 'Usuario y contraseña requeridos' });
         }
         
-        const data = await readDatabase();
-        const users = data.users || [];
-        const user = users.find(u => u.username === username.toLowerCase());
+        const user = await db.getUserByUsername(username);
         
         if (!user) {
             return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
@@ -179,8 +127,8 @@ app.post('/api/auth/logout', (req, res) => {
 // GET: Get public schedules
 app.get('/api/public/schedules', async (req, res) => {
     try {
-        const data = await readDatabase();
-        res.json(data.schedules || {});
+        const schedules = await db.getAllSchedules();
+        res.json(schedules);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -189,8 +137,8 @@ app.get('/api/public/schedules', async (req, res) => {
 // GET: Get public templates
 app.get('/api/public/templates', async (req, res) => {
     try {
-        const data = await readDatabase();
-        res.json(data.templates || []);
+        const templates = await db.getAllTemplates();
+        res.json(templates);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -199,8 +147,8 @@ app.get('/api/public/templates', async (req, res) => {
 // GET: Get public employees
 app.get('/api/public/employees', async (req, res) => {
     try {
-        const data = await readDatabase();
-        res.json(data.employees || []);
+        const employees = await db.getAllEmployees();
+        res.json(employees);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -209,8 +157,8 @@ app.get('/api/public/employees', async (req, res) => {
 // GET: Get public vacations
 app.get('/api/public/vacations', async (req, res) => {
     try {
-        const data = await readDatabase();
-        res.json(data.vacations || {});
+        const vacations = await db.getAllVacations();
+        res.json(vacations);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -221,8 +169,13 @@ app.get('/api/public/vacations', async (req, res) => {
 // GET: Get all data (protected)
 app.get('/api/data', requireAuth, async (req, res) => {
     try {
-        const data = await readDatabase();
-        res.json(data);
+        const [employees, templates, schedules, vacations] = await Promise.all([
+            db.getAllEmployees(),
+            db.getAllTemplates(),
+            db.getAllSchedules(),
+            db.getAllVacations()
+        ]);
+        res.json({ employees, templates, schedules, vacations });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -231,8 +184,8 @@ app.get('/api/data', requireAuth, async (req, res) => {
 // GET: Get employees (protected)
 app.get('/api/employees', requireAuth, async (req, res) => {
     try {
-        const data = await readDatabase();
-        res.json(data.employees || []);
+        const employees = await db.getAllEmployees();
+        res.json(employees);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -241,9 +194,7 @@ app.get('/api/employees', requireAuth, async (req, res) => {
 // POST: Save employees (protected)
 app.post('/api/employees', requireAuth, async (req, res) => {
     try {
-        const data = await readDatabase();
-        data.employees = req.body;
-        await writeDatabase(data);
+        await db.saveEmployees(req.body);
         res.json({ success: true, message: 'Empleados guardados correctamente' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -253,8 +204,8 @@ app.post('/api/employees', requireAuth, async (req, res) => {
 // GET: Get templates (protected)
 app.get('/api/templates', requireAuth, async (req, res) => {
     try {
-        const data = await readDatabase();
-        res.json(data.templates || []);
+        const templates = await db.getAllTemplates();
+        res.json(templates);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -263,9 +214,7 @@ app.get('/api/templates', requireAuth, async (req, res) => {
 // POST: Save templates (protected)
 app.post('/api/templates', requireAuth, async (req, res) => {
     try {
-        const data = await readDatabase();
-        data.templates = req.body;
-        await writeDatabase(data);
+        await db.saveTemplates(req.body);
         res.json({ success: true, message: 'Templates guardados correctamente' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -275,8 +224,8 @@ app.post('/api/templates', requireAuth, async (req, res) => {
 // GET: Get schedules (protected)
 app.get('/api/schedules', requireAuth, async (req, res) => {
     try {
-        const data = await readDatabase();
-        res.json(data.schedules || {});
+        const schedules = await db.getAllSchedules();
+        res.json(schedules);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -285,9 +234,7 @@ app.get('/api/schedules', requireAuth, async (req, res) => {
 // POST: Save schedules (protected)
 app.post('/api/schedules', requireAuth, async (req, res) => {
     try {
-        const data = await readDatabase();
-        data.schedules = req.body;
-        await writeDatabase(data);
+        await db.saveSchedules(req.body);
         res.json({ success: true, message: 'Horarios guardados correctamente' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -297,8 +244,8 @@ app.post('/api/schedules', requireAuth, async (req, res) => {
 // GET: Get vacations (protected)
 app.get('/api/vacations', requireAuth, async (req, res) => {
     try {
-        const data = await readDatabase();
-        res.json(data.vacations || {});
+        const vacations = await db.getAllVacations();
+        res.json(vacations);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -307,9 +254,7 @@ app.get('/api/vacations', requireAuth, async (req, res) => {
 // POST: Save vacations (protected)
 app.post('/api/vacations', requireAuth, async (req, res) => {
     try {
-        const data = await readDatabase();
-        data.vacations = req.body;
-        await writeDatabase(data);
+        await db.saveVacations(req.body);
         res.json({ success: true, message: 'Vacaciones guardadas correctamente' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -339,10 +284,23 @@ if (isProduction) {
     });
 }
 
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+    console.log('SIGTERM signal received: closing HTTP server');
+    await closePool();
+    process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+    console.log('SIGINT signal received: closing HTTP server');
+    await closePool();
+    process.exit(0);
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📁 Database: ${DB_FILE}`);
+    console.log(`🗄️  Database: PostgreSQL`);
     console.log(`🔐 Login: http://localhost:${PORT}/login.html`);
     console.log(`👁️  Public view: http://localhost:${PORT}/public.html`);
     if (isProduction) {

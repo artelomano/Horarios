@@ -117,58 +117,28 @@ npm run dev         # In another terminal (Express server)
 
 ## 📊 Database Structure
 
-The application uses a JSON file (`database.json`) as the database. The structure is:
+The application uses **PostgreSQL** as the database. The database schema is automatically created on first run.
 
-```json
-{
-  "users": [
-    {
-      "username": "patricia",
-      "password": "<hashed_password>",
-      "role": "admin"
-    }
-  ],
-  "employees": [
-    {
-      "id": 1,
-      "name": "Patricia",
-      "type": "internal",
-      "role": "Administradora",
-      "hoursPerWeek": 40,
-      "hoursStatus": 0,
-      "comments": "",
-      "color": "#B3D9FF"
-    }
-  ],
-  "templates": [
-    {
-      "id": "template1",
-      "name": "Template 1",
-      "data": {
-        "monday": {
-          "morning": [
-            { "reception": [] },
-            { "internal": [], "external": [] }
-          ],
-          "afternoon": [
-            { "reception": [] },
-            { "internal": [], "external": [] }
-          ]
-        }
-      }
-    }
-  ],
-  "schedules": {
-    "2025-01": {
-      "2025-01-17": {
-        "morning": [],
-        "afternoon": []
-      }
-    }
-  },
-  "vacations": {}
-}
-```
+### Automatic Setup
+
+When the server starts, it automatically:
+1. Checks if the database schema exists
+2. Creates tables if they don't exist
+3. Creates default user (patricia / 123456) if it doesn't exist
+
+This means **no manual setup is required** - just set the `DATABASE_URL` environment variable in Railway!
+
+### Database Schema
+
+The database consists of the following tables:
+
+- **users**: Authentication and user management
+- **employees**: Employee information (internal/external/service)
+- **templates**: Weekly schedule templates
+- **schedules**: Monthly schedules (stored as JSONB)
+- **vacations**: Employee vacation records
+
+All tables include `created_at` and `updated_at` timestamps that are automatically managed.
 
 ## 🔐 Authentication
 
@@ -225,6 +195,9 @@ Currently on leave. This status can be registered in the comments field.
 
 ### Environment Variables
 Set the following in Railway:
+- `DATABASE_URL` - PostgreSQL connection string (required)
+  - Format: `postgresql://user:password@host:port/database`
+  - Railway automatically provides this when you add a PostgreSQL service
 - `NODE_ENV=production`
 - `PORT` (automatically set by Railway)
 - `SESSION_SECRET` (optional, for production security)
@@ -240,9 +213,7 @@ npm start
 ```
 
 ### Database Persistence
-The `database.json` file will be persisted in Railway's filesystem. For production, consider:
-- Using Railway's persistent volume
-- Or migrating to a proper database (PostgreSQL, MongoDB, etc.)
+The application uses PostgreSQL, which is automatically persisted by Railway. The database schema and default user are created automatically on first run - no manual setup required!
 
 ## 🔄 API Endpoints
 

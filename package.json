@@ -10,7 +10,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "dev:client": "vite",
-    "init-db": "node scripts/initDatabase.js"
+    "init-db": "node scripts/initDatabase.js",
+    "setup-postgres": "node scripts/setupPostgres.js",
+    "migrate-data": "node database/migrations/002_migrate_data.js"
   },
   "keywords": [
     "horarios",
@@ -27,7 +29,8 @@
     "bcrypt": "^5.1.1",
     "express-session": "^1.17.3",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

@@ -262,7 +262,9 @@
         "tuesday": {
           "morning": [
             {
-              "reception": []
+              "reception": [
+                2
+              ]
             },
             {
               "internal": [],
@@ -345,70 +347,8 @@
   "schedules": {
     "2025-11": {
       "2025-11-02": {
-        "morning": [
-          {
-            "employeeId": 2,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "RECEPCIÓN"
-          },
-          {
-            "employeeId": 1,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 1 - Interno"
-          },
-          {
-            "employeeId": 13,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 1 - Externo"
-          },
-          {
-            "employeeId": 3,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 2 - Interno"
-          },
-          {
-            "employeeId": 6,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 2 - Externo"
-          }
-        ],
-        "afternoon": [
-          {
-            "employeeId": 2,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "RECEPCIÓN"
-          },
-          {
-            "employeeId": 1,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 1 - Interno"
-          },
-          {
-            "employeeId": 13,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 1 - Externo"
-          },
-          {
-            "employeeId": 4,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 2 - Interno"
-          },
-          {
-            "employeeId": 8,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 2 - Externo"
-          }
-        ]
+        "morning": [],
+        "afternoon": []
       },
       "2025-11-03": {
         "morning": [
@@ -417,218 +357,20 @@
             "startTime": "09:30",
             "cancelled": false,
             "notes": "RECEPCIÓN"
-          },
-          {
-            "employeeId": 1,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 1 - Interno"
-          },
-          {
-            "employeeId": 9,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 1 - Externo"
           }
         ],
-        "afternoon": [
-          {
-            "employeeId": 2,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "RECEPCIÓN"
-          },
-          {
-            "employeeId": 1,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 1 - Interno"
-          },
-          {
-            "employeeId": 9,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 1 - Externo"
-          },
-          {
-            "employeeId": 4,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 2 - Interno"
-          },
-          {
-            "employeeId": 11,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 2 - Externo"
-          },
-          {
-            "employeeId": 3,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 3 - Interno"
-          },
-          {
-            "employeeId": 10,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 3 - Externo"
-          }
-        ]
+        "afternoon": []
       },
       "2025-11-04": {
-        "morning": [
-          {
-            "employeeId": 2,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "RECEPCIÓN"
-          },
-          {
-            "employeeId": 1,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 1 - Interno"
-          },
-          {
-            "employeeId": 5,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 1 - Externo"
-          },
-          {
-            "employeeId": 3,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 2 - Interno"
-          },
-          {
-            "employeeId": 12,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 2 - Externo"
-          }
-        ],
-        "afternoon": [
-          {
-            "employeeId": 2,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "RECEPCIÓN"
-          },
-          {
-            "employeeId": 1,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 1 - Interno"
-          },
-          {
-            "employeeId": 5,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 1 - Externo"
-          },
-          {
-            "employeeId": 4,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 2 - Interno"
-          },
-          {
-            "employeeId": 8,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 2 - Externo"
-          }
-        ]
+        "morning": [],
+        "afternoon": []
       },
       "2025-11-05": {
-        "morning": [
-          {
-            "employeeId": 2,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "RECEPCIÓN"
-          },
-          {
-            "employeeId": 4,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 1 - Interno"
-          },
-          {
-            "employeeId": 12,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 1 - Externo"
-          },
-          {
-            "employeeId": 3,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 2 - Interno"
-          },
-          {
-            "employeeId": 6,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 2 - Externo"
-          }
-        ],
-        "afternoon": [
-          {
-            "employeeId": 1,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "RECEPCIÓN"
-          },
-          {
-            "employeeId": 4,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 1 - Interno"
-          },
-          {
-            "employeeId": 12,
-            "startTime": "16:00",
-            "cancelled": false,
-            "notes": "Slot 1 - Externo"
-          }
-        ]
+        "morning": [],
+        "afternoon": []
       },
       "2025-11-06": {
-        "morning": [
-          {
-            "employeeId": 2,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "RECEPCIÓN"
-          },
-          {
-            "employeeId": 4,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 1 - Interno"
-          },
-          {
-            "employeeId": 12,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 1 - Externo"
-          },
-          {
-            "employeeId": 3,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 2 - Interno"
-          },
-          {
-            "employeeId": 13,
-            "startTime": "09:30",
-            "cancelled": false,
-            "notes": "Slot 2 - Externo"
-          }
-        ],
+        "morning": [],
         "afternoon": []
       },
       "2025-11-09": {
