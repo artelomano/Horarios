@@ -1,0 +1,86 @@
+.employee-card {
+  border: 1px solid var(--color-light-grey);
+  border-radius: 8px;
+  padding: 1.5rem;
+  background-color: var(--color-white);
+  transition: box-shadow 0.3s ease;
+}
+
+.employee-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.employee-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.employee-color-indicator {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--color-light-grey);
+}
+
+.employee-card-header h3 {
+  flex: 1;
+  margin: 0;
+}
+
+.employee-card-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.employee-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.employee-role {
+  font-weight: 500;
+  color: var(--color-secondary);
+}
+
+.employee-type {
+  font-size: 0.9rem;
+  color: var(--color-light-grey);
+}
+
+.employee-hours {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-light-grey);
+}
+
+.employee-hours p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.hours-warning {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.employee-comments {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-light-grey);
+  font-size: 0.9rem;
+}
+
+.employee-comments strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.employee-comments p {
+  margin: 0;
+  color: var(--color-secondary);
+  font-style: italic;
+}
+

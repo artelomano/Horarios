@@ -115,9 +115,51 @@ const SHIFT_TIMES = {
 const WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 const WEEKDAY_NAMES = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
 
+// Verificar autenticación antes de cargar
+async function checkAuthentication() {
+    try {
+        const response = await fetch('/api/auth/check', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (!data.authenticated) {
+            // No autenticado, redirigir a login
+            window.location.href = 'login.html';
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error('Error verificando autenticación:', error);
+        window.location.href = 'login.html';
+        return false;
+    }
+}
+
+// Función de logout
+async function logout() {
+    try {
+        await fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+        window.location.href = 'login.html';
+    } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+        window.location.href = 'login.html';
+    }
+}
+
 // Inicializar aplicación
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Inicializando aplicación...');
+    
+    // Verificar autenticación primero
+    const isAuthenticated = await checkAuthentication();
+    if (!isAuthenticated) {
+        return; // Ya redirigió a login
+    }
+    
     await loadEmployees();
     await loadTemplate();
     await loadSchedules();
@@ -131,7 +173,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadEmployees() {
     console.log('Cargando empleados desde la base de datos...');
     try {
-        const response = await fetch('/api/employees');
+        const response = await fetch('/api/employees', {
+            credentials: 'include'
+        });
         if (response.ok) {
             employees = await response.json();
             // Asegurar que todos los empleados tengan color
@@ -218,6 +262,7 @@ async function saveEmployees() {
         const response = await fetch('/api/employees', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(employees)
         });
         if (response.ok) {
@@ -234,7 +279,9 @@ async function saveEmployees() {
 async function loadTemplate() {
     console.log('Cargando templates semanales...');
     try {
-        const response = await fetch('/api/templates');
+        const response = await fetch('/api/templates', {
+            credentials: 'include'
+        });
         if (response.ok) {
             const parsed = await response.json();
             
@@ -293,6 +340,7 @@ async function saveTemplate() {
         const response = await fetch('/api/templates', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(templates)
         });
         if (response.ok) {
@@ -309,7 +357,9 @@ async function saveTemplate() {
 async function loadSchedules() {
     console.log('Cargando horarios mensuales...');
     try {
-        const response = await fetch('/api/schedules');
+        const response = await fetch('/api/schedules', {
+            credentials: 'include'
+        });
         if (response.ok) {
             schedules = await response.json();
             console.log('Horarios mensuales cargados');
@@ -326,6 +376,7 @@ async function saveSchedules() {
         const response = await fetch('/api/schedules', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(schedules)
         });
         if (response.ok) {
@@ -342,7 +393,9 @@ async function saveSchedules() {
 async function loadVacations() {
     console.log('Cargando vacaciones...');
     try {
-        const response = await fetch('/api/vacations');
+        const response = await fetch('/api/vacations', {
+            credentials: 'include'
+        });
         if (response.ok) {
             vacations = await response.json();
             console.log('Vacaciones cargadas correctamente');
@@ -363,6 +416,7 @@ async function saveVacations() {
         const response = await fetch('/api/vacations', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(vacations)
         });
         if (response.ok) {
@@ -560,6 +614,7 @@ function renderTemplateEditor() {
             </div>
             <div style="display: flex; gap: 5px;">
                 <button type="button" class="btn-secondary btn-small" id="renameTemplateBtn" title="Renombrar template">✏️</button>
+                <button type="button" class="btn-secondary btn-small" id="duplicateTemplateBtn" title="Duplicar template">📋</button>
                 <button type="button" class="btn-secondary btn-small" id="createTemplateBtn" title="Crear nuevo template">+</button>
                 ${templates.length > 1 ? `<button type="button" class="btn-delete btn-small" id="deleteTemplateBtn" title="Eliminar template">🗑️</button>` : ''}
             </div>
@@ -584,6 +639,29 @@ function renderTemplateEditor() {
             template.name = newName.trim();
             saveTemplate();
             renderTemplateEditor();
+        }
+    });
+    
+    // Event listener para duplicar template
+    document.getElementById('duplicateTemplateBtn').addEventListener('click', () => {
+        const template = getCurrentTemplate();
+        if (!template) return;
+        
+        const newName = prompt(`Duplicar template:\n\nTemplate original: ${template.name}\n\nNombre del nuevo template:`, `${template.name} (copia)`);
+        if (newName && newName.trim()) {
+            // Crear copia profunda del template
+            const newId = 'template' + Date.now();
+            const duplicatedData = JSON.parse(JSON.stringify(template.data)); // Deep copy
+            
+            templates.push({
+                id: newId,
+                name: newName.trim(),
+                data: duplicatedData
+            });
+            currentTemplateId = newId;
+            saveTemplate();
+            renderTemplateEditor();
+            alert(`Template "${template.name}" duplicado como "${newName.trim()}"`);
         }
     });
     
@@ -1123,7 +1201,8 @@ function updateTemplateHoursSummary() {
 // Renderizar calendario mensual con horarios
 function renderMonthlySchedule() {
     console.log('Renderizando calendario mensual...');
-    loadSchedules();
+    // No recargar schedules aquí para evitar perder cambios locales cuando se aplica un template
+    // Los schedules ya están en memoria y se guardan después de aplicar el template
     const scheduleContainer = document.getElementById('monthlySchedule');
     const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -1633,7 +1712,7 @@ function convertSlotsToShifts(slots, shiftType) {
 }
 
 // Aplicar template a una semana específica
-function applyTemplateToWeek(week, firstDay, lastDay, monthKey, templateId = 'template1') {
+async function applyTemplateToWeek(week, firstDay, lastDay, monthKey, templateId = 'template1') {
     const templateObj = getTemplateById(templateId);
     if (!templateObj) {
         console.error(`Template ${templateId} not found`);
@@ -1689,9 +1768,9 @@ function applyTemplateToWeek(week, firstDay, lastDay, monthKey, templateId = 'te
             schedules[monthKey][dateStr].afternoon = convertSlotsToShifts(afternoonSlots, 'afternoon');
         }
         
-        saveSchedules();
+        await saveSchedules();
         renderMonthlySchedule();
-        console.log(`${templateName} aplicado correctamente`);
+        console.log(`${templateObj.name} aplicado correctamente`);
     }
 }
 

@@ -1,112 +1,16 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Horarios</title>
-    <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Gestor de Horarios</h1>
-            <div class="header-actions">
-                <button id="manageEmployeesBtn" class="btn-secondary">Gestión de Personal y Servicios</button>
-                <button id="editTemplateBtn" class="btn-secondary">Editar Template Semanal</button>
-                <button id="viewCalendarBtn" class="btn-secondary">Ver Calendario</button>
-            </div>
-        </header>
-
-        <!-- Template Editor View -->
-        <div id="templateView" class="view">
-            <h2>Template Semanal</h2>
-            <p class="info-text">Define el horario base semanal que se aplicará a todos los meses. Los turnos de mañana son de 9:30-14:00 (4.5h) y los de tarde de 16:00-20:30 (4.5h).</p>
-            <div id="templateEditor" class="template-editor"></div>
-            <div class="template-actions">
-                <button id="saveTemplateBtn" class="btn-primary">Guardar Template</button>
-            </div>
-        </div>
-
-        <!-- Calendar View -->
-        <div id="calendarView" class="view active">
-            <div class="calendar-controls">
-                <button id="prevMonth" class="btn-secondary">← Anterior</button>
-                <h2 id="currentMonth"></h2>
-                <button id="nextMonth" class="btn-secondary">Siguiente →</button>
-            </div>
-            <div id="monthlySchedule" class="monthly-schedule"></div>
-        </div>
-
-        <!-- Employee Management View -->
-        <div id="employeeView" class="view">
-            <h2>Gestión de Personal y Servicios</h2>
-            <button id="addEmployeeBtn" class="btn-primary">Añadir Nuevo Empleado</button>
-            <div id="employeesList" class="employees-list"></div>
-        </div>
-
-        <!-- Shift Assignment Modal is now created dynamically -->
-
-        <!-- Vacations Modal -->
-        <div id="vacationsModal" class="modal">
-            <div class="modal-content" style="max-width: 800px;">
-                <span class="close-vacations">&times;</span>
-                <h2 id="vacationsModalTitle">Gestionar Vacaciones</h2>
-                <div id="vacationsContent"></div>
-            </div>
-        </div>
-
-        <!-- Employee Modal -->
-        <div id="employeeModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2 id="modalTitle">Añadir Empleado</h2>
-                <form id="employeeForm">
-                    <input type="hidden" id="employeeId">
-                    
-                    <label for="employeeName">Nombre:</label>
-                    <input type="text" id="employeeName" required>
-                    
-                    <label for="employeeType">Tipo:</label>
-                    <select id="employeeType" required>
-                        <option value="internal">Interno</option>
-                        <option value="external">Externo</option>
-                        <option value="service">Servicio</option>
-                    </select>
-                    
-                    <label for="employeeRole">Rol:</label>
-                    <input type="text" id="employeeRole" placeholder="ej: Administradora, Recepcionista, Higienista">
-                    
-                    <label for="hoursPerWeek">Horas por Semana (Solo internos):</label>
-                    <input type="number" id="hoursPerWeek" min="0" step="0.5" value="0">
-                    
-                    <label for="hoursStatus">Estado de Horas (Solo internos):</label>
-                    <input type="number" id="hoursStatus" step="0.5" value="0" placeholder="Saldo actual de horas">
-                    
-                    <label for="employeeComments">Comentarios:</label>
-                    <textarea id="employeeComments" rows="4" placeholder="Notas especiales, excepciones, turnos especiales, etc."></textarea>
-                    
-                    <div id="colorFieldContainer">
-                        <label for="employeeColor">Color:</label>
-                        <div class="color-picker-container">
-                            <input type="color" id="employeeColor" value="#B3D9FF">
-                            <input type="text" id="employeeColorText" placeholder="#B3D9FF" pattern="^#[0-9A-Fa-f]{6}$">
-                        </div>
-                        <small>Selecciona un color pastel para identificar al empleado en el calendario</small>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">Guardar</button>
-                        <button type="button" class="btn-secondary" id="cancelBtn">Cancelar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script src="app.js"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
 

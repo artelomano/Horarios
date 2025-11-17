@@ -1,0 +1,22 @@
+.calendar-view {
+  width: 100%;
+}
+
+.calendar-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.calendar-controls h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.calendar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+

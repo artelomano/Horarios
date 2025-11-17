@@ -1,0 +1,11 @@
+.week-view {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1rem;
+  min-height: 200px;
+}
+
+.day-placeholder {
+  /* Empty placeholder for days outside the month */
+}
+

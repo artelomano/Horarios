@@ -1,0 +1,51 @@
+.day-view {
+  border: 1px solid var(--color-light-grey);
+  border-radius: 4px;
+  padding: 0.5rem;
+  min-height: 150px;
+  background-color: var(--color-white);
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-light-grey);
+}
+
+.day-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.day-number {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.day-shifts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shift-section {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.shift-label {
+  font-weight: 600;
+  font-size: 0.8rem;
+  min-width: 20px;
+  text-align: center;
+}
+
+.shift-separator {
+  height: 1px;
+  background-color: var(--color-light-grey);
+  margin: 0.25rem 0;
+}
+
