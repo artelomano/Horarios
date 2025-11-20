@@ -7,8 +7,16 @@ import { query, transaction } from './postgres.js';
 // ========== USERS ==========
 
 export async function getUserByUsername(username) {
-  const result = await query('SELECT * FROM users WHERE username = $1', [username.toLowerCase()]);
-  return result.rows[0] || null;
+  try {
+    const result = await query('SELECT * FROM users WHERE username = $1', [username.toLowerCase()]);
+    return result.rows[0] || null;
+  } catch (error) {
+    // Re-throw with more context
+    if (error.message.includes('Database connection not available')) {
+      throw new Error('Database connection not available. Please set DATABASE_URL in Railway environment variables.');
+    }
+    throw error;
+  }
 }
 
 export async function createUser(username, password, role = 'admin') {

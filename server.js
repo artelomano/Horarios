@@ -79,34 +79,47 @@ app.post('/api/auth/login', async (req, res) => {
             return res.status(400).json({ error: 'Usuario y contraseña requeridos' });
         }
         
-        const user = await db.getUserByUsername(username);
-        
-        if (!user) {
-            return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
-        }
-        
-        const passwordMatch = await bcrypt.compare(password, user.password);
-        
-        if (!passwordMatch) {
-            return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
-        }
-        
-        // Create session
-        req.session.authenticated = true;
-        req.session.username = user.username;
-        req.session.role = user.role;
-        
-        res.json({ 
-            success: true, 
-            message: 'Login exitoso',
-            user: {
-                username: user.username,
-                role: user.role
+        try {
+            const user = await db.getUserByUsername(username);
+            
+            if (!user) {
+                return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
             }
-        });
+            
+            const passwordMatch = await bcrypt.compare(password, user.password);
+            
+            if (!passwordMatch) {
+                return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+            }
+            
+            // Create session
+            req.session.authenticated = true;
+            req.session.username = user.username;
+            req.session.role = user.role;
+            
+            res.json({ 
+                success: true, 
+                message: 'Login exitoso',
+                user: {
+                    username: user.username,
+                    role: user.role
+                }
+            });
+        } catch (dbError) {
+            // Database connection error
+            if (dbError.message.includes('Database connection not available') || 
+                dbError.message.includes('not available')) {
+                console.error('❌ Database not available for login:', dbError.message);
+                return res.status(503).json({ 
+                    error: 'Base de datos no disponible. Por favor, verifica la configuración de DATABASE_URL en Railway.' 
+                });
+            }
+            throw dbError; // Re-throw other database errors
+        }
     } catch (error) {
         console.error('Error en login:', error);
-        res.status(500).json({ error: 'Error al procesar el login' });
+        console.error('Error details:', error.message);
+        res.status(500).json({ error: 'Error al procesar el login: ' + error.message });
     }
 });
 
