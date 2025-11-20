@@ -117,9 +117,23 @@ app.post('/api/auth/login', async (req, res) => {
             throw dbError; // Re-throw other database errors
         }
     } catch (error) {
-        console.error('Error en login:', error);
-        console.error('Error details:', error.message);
-        res.status(500).json({ error: 'Error al procesar el login: ' + error.message });
+        console.error('❌ Error en login:', error);
+        console.error('   Error message:', error.message);
+        console.error('   Error stack:', error.stack);
+        
+        // Provide more specific error messages
+        let errorMessage = 'Error al procesar el login';
+        let statusCode = 500;
+        
+        if (error.message.includes('Database connection not available') || 
+            error.message.includes('not available')) {
+            errorMessage = 'Base de datos no disponible. Por favor, verifica la configuración de DATABASE_URL en Railway.';
+            statusCode = 503;
+        } else if (error.message) {
+            errorMessage = `Error al procesar el login: ${error.message}`;
+        }
+        
+        res.status(statusCode).json({ error: errorMessage });
     }
 });
 
