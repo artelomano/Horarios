@@ -172,9 +172,15 @@ export async function query(text, params) {
 
 /**
  * Execute a transaction
+ * Throws error if database is not available
  */
 export async function transaction(callback) {
   const pool = getPool();
+  
+  if (!pool) {
+    throw new Error('Database connection not available. Please set DATABASE_URL in Railway environment variables.');
+  }
+  
   const client = await pool.connect();
   
   try {
