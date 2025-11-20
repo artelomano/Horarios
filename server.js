@@ -261,15 +261,18 @@ app.post('/api/vacations', requireAuth, async (req, res) => {
     }
 });
 
+// Serve test-app directory for subdirectory testing
+app.use('/test-app', express.static(path.join(__dirname, 'test-app')));
+
 // Serve static files from React build in production
 if (isProduction) {
     const distPath = path.join(__dirname, 'dist');
     app.use(express.static(distPath));
     
-    // Serve React app for all non-API routes
+    // Serve React app for all non-API routes (except test-app)
     app.get('*', (req, res) => {
-        // Don't serve React app for API routes
-        if (req.path.startsWith('/api')) {
+        // Don't serve React app for API routes or test-app
+        if (req.path.startsWith('/api') || req.path.startsWith('/test-app')) {
             return res.status(404).json({ error: 'Not found' });
         }
         res.sendFile(path.join(distPath, 'index.html'));

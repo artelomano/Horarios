@@ -9,6 +9,29 @@ const { Pool } = pg;
 let pool = null;
 
 /**
+ * Build database connection string from Railway environment variables
+ */
+function buildConnectionString() {
+  // If DATABASE_URL is directly provided, use it
+  if (process.env.DATABASE_URL) {
+    return process.env.DATABASE_URL;
+  }
+  
+  // Otherwise, build from Railway environment variables
+  const pgUser = process.env.PGUSER || process.env.POSTGRES_USER || 'postgres';
+  const pgPassword = process.env.POSTGRES_PASSWORD || process.env.PGPASSWORD;
+  const pgHost = process.env.RAILWAY_PRIVATE_DOMAIN || process.env.PGHOST || 'localhost';
+  const pgPort = process.env.PGPORT || '5432';
+  const pgDatabase = process.env.PGDATABASE || process.env.POSTGRES_DB || 'railway';
+  
+  if (!pgPassword) {
+    throw new Error('PostgreSQL password not found. Set DATABASE_URL or POSTGRES_PASSWORD');
+  }
+  
+  return `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}`;
+}
+
+/**
  * Initialize database connection pool
  */
 export function initDatabase() {
@@ -16,11 +39,9 @@ export function initDatabase() {
     return pool;
   }
 
-  const connectionString = process.env.DATABASE_URL;
+  const connectionString = buildConnectionString();
   
-  if (!connectionString) {
-    throw new Error('DATABASE_URL environment variable is not set');
-  }
+  console.log('Database connection string built from environment variables');
 
   console.log('Initializing PostgreSQL connection pool...');
   
