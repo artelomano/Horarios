@@ -16,7 +16,7 @@ This guide explains how to migrate from JSON database to PostgreSQL.
 3. Go to "Variables" tab
 4. Add or verify `DATABASE_URL` is set to:
    ```
-   postgresql://postgres:xTPpTkIjyzhuichXDJmWYbqIGdqWBRRM@postgres.railway.internal:5432/railway
+   postgresql://postgres:****@postgres.railway.internal:5432/railway
    ```
 
 ### Step 2: Run Database Setup

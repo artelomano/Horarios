@@ -11,10 +11,7 @@
     "preview": "vite preview",
     "dev:client": "vite",
     "init-db": "node scripts/initDatabase.js",
-    "setup-postgres": "node scripts/setupPostgres.js",
-    "create-tables": "node scripts/createTables.js",
-    "migrate-data": "node database/migrations/002_migrate_data.js",
-    "show-schema": "node scripts/showSchema.js"
+    "migrate-data": "node database/migrations/002_migrate_data.js"
   },
   "keywords": [
     "horarios",

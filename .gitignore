@@ -10,6 +10,14 @@ build/
 .env
 .env.local
 .env.production
+.env.*
+
+# Sensitive data
+*secret*
+*password*
+*key*
+*token*
+*credentials*
 
 # Logs
 *.log
