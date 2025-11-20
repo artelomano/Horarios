@@ -19,11 +19,22 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Initialize database connection and run auto-setup
-initDatabase();
-autoSetup().catch(err => {
-  console.error('Auto-setup error:', err);
-});
+// Initialize database connection and run auto-setup (non-blocking)
+// App will start even if database is not available
+try {
+  const dbPool = initDatabase();
+  if (dbPool) {
+    autoSetup().catch(err => {
+      console.error('Auto-setup error:', err);
+    });
+  } else {
+    console.warn('⚠️  Database not available - app will start but DB operations will fail');
+    console.warn('   Set DATABASE_URL in Railway environment variables');
+  }
+} catch (err) {
+  console.error('Database initialization error:', err.message);
+  console.error('App will continue but database operations will fail');
+}
 
 // Middleware
 app.use(cors({

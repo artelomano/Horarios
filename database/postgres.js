@@ -11,6 +11,7 @@ let pool = null;
 /**
  * Build database connection string from Railway environment variables
  * Railway automatically injects DATABASE_URL when PostgreSQL service is connected
+ * Returns null if connection info is not available (allows app to start without DB)
  */
 function buildConnectionString() {
   // Priority 1: DATABASE_URL (Railway automatically provides this)
@@ -27,18 +28,12 @@ function buildConnectionString() {
   const pgPort = process.env.PGPORT || '5432';
   const pgDatabase = process.env.PGDATABASE || process.env.POSTGRES_DB || 'railway';
   
-  // Validate required fields
-  if (!pgPassword) {
-    console.error('❌ PostgreSQL password not found');
-    console.error('   Railway should automatically provide DATABASE_URL');
-    console.error('   Or set POSTGRES_PASSWORD environment variable');
-    throw new Error('PostgreSQL connection failed: Password not found. Railway should provide DATABASE_URL automatically when PostgreSQL service is connected.');
-  }
-  
-  if (!pgHost) {
-    console.error('❌ PostgreSQL host not found');
-    console.error('   Set RAILWAY_PRIVATE_DOMAIN or PGHOST');
-    throw new Error('PostgreSQL connection failed: Host not found');
+  // If we don't have required fields, return null (don't throw error)
+  if (!pgPassword || !pgHost) {
+    console.warn('⚠️  PostgreSQL connection info not available');
+    console.warn('   Railway should automatically provide DATABASE_URL when PostgreSQL service is connected');
+    console.warn('   App will start but database operations will fail until DATABASE_URL is set');
+    return null;
   }
   
   const connectionString = `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}`;
@@ -49,15 +44,22 @@ function buildConnectionString() {
 /**
  * Initialize database connection pool
  * Handles Railway PostgreSQL connection with proper SSL configuration
+ * Returns null if connection info is not available (allows app to start)
  */
 export function initDatabase() {
   if (pool) {
     return pool;
   }
 
+  const connectionString = buildConnectionString();
+  
+  // If no connection string available, return null (don't crash)
+  if (!connectionString) {
+    console.warn('⚠️  Database connection not available - app will start but DB operations will fail');
+    return null;
+  }
+
   try {
-    const connectionString = buildConnectionString();
-    
     console.log('🗄️  Initializing PostgreSQL connection pool...');
     
     // Determine SSL requirements
@@ -90,38 +92,47 @@ export function initDatabase() {
       console.error('   Attempting to reconnect...');
     });
 
-    // Test connection on initialization
+    // Test connection on initialization (async, don't block)
     pool.query('SELECT NOW()')
       .then(() => {
         console.log('✅ PostgreSQL connection established successfully');
       })
       .catch((err) => {
         console.error('❌ PostgreSQL connection test failed:', err.message);
-        console.error('   Check your DATABASE_URL or Railway PostgreSQL service connection');
+        console.error('   App will continue but database operations may fail');
+        console.error('   Make sure DATABASE_URL is set in Railway variables');
       });
 
     return pool;
   } catch (error) {
     console.error('❌ Failed to initialize database:', error.message);
-    throw error;
+    console.error('   App will continue but database operations will fail');
+    return null; // Don't throw, allow app to start
   }
 }
 
 /**
  * Get database pool (initialize if needed)
+ * Returns null if database is not available
  */
 export function getPool() {
   if (!pool) {
-    return initDatabase();
+    pool = initDatabase();
   }
   return pool;
 }
 
 /**
  * Execute a query with retry logic for connection issues
+ * Throws error if database is not available
  */
 export async function query(text, params) {
   const pool = getPool();
+  
+  if (!pool) {
+    throw new Error('Database connection not available. Please set DATABASE_URL in Railway environment variables.');
+  }
+  
   const start = Date.now();
   const maxRetries = 3;
   let lastError;
