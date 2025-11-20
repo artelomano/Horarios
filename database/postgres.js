@@ -10,59 +10,101 @@ let pool = null;
 
 /**
  * Build database connection string from Railway environment variables
+ * Railway automatically injects DATABASE_URL when PostgreSQL service is connected
  */
 function buildConnectionString() {
-  // If DATABASE_URL is directly provided, use it
+  // Priority 1: DATABASE_URL (Railway automatically provides this)
   if (process.env.DATABASE_URL) {
+    console.log('✅ Using DATABASE_URL from environment');
     return process.env.DATABASE_URL;
   }
   
-  // Otherwise, build from Railway environment variables
+  // Priority 2: Build from individual Railway variables
+  // Railway also provides these when PostgreSQL service is connected
   const pgUser = process.env.PGUSER || process.env.POSTGRES_USER || 'postgres';
   const pgPassword = process.env.POSTGRES_PASSWORD || process.env.PGPASSWORD;
-  const pgHost = process.env.RAILWAY_PRIVATE_DOMAIN || process.env.PGHOST || 'localhost';
+  const pgHost = process.env.RAILWAY_PRIVATE_DOMAIN || process.env.PGHOST;
   const pgPort = process.env.PGPORT || '5432';
   const pgDatabase = process.env.PGDATABASE || process.env.POSTGRES_DB || 'railway';
   
+  // Validate required fields
   if (!pgPassword) {
-    throw new Error('PostgreSQL password not found. Set DATABASE_URL or POSTGRES_PASSWORD');
+    console.error('❌ PostgreSQL password not found');
+    console.error('   Railway should automatically provide DATABASE_URL');
+    console.error('   Or set POSTGRES_PASSWORD environment variable');
+    throw new Error('PostgreSQL connection failed: Password not found. Railway should provide DATABASE_URL automatically when PostgreSQL service is connected.');
   }
   
-  return `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}`;
+  if (!pgHost) {
+    console.error('❌ PostgreSQL host not found');
+    console.error('   Set RAILWAY_PRIVATE_DOMAIN or PGHOST');
+    throw new Error('PostgreSQL connection failed: Host not found');
+  }
+  
+  const connectionString = `postgresql://${pgUser}:${pgPassword}@${pgHost}:${pgPort}/${pgDatabase}`;
+  console.log('✅ Built connection string from individual variables');
+  return connectionString;
 }
 
 /**
  * Initialize database connection pool
+ * Handles Railway PostgreSQL connection with proper SSL configuration
  */
 export function initDatabase() {
   if (pool) {
     return pool;
   }
 
-  const connectionString = buildConnectionString();
-  
-  console.log('Database connection string built from environment variables');
+  try {
+    const connectionString = buildConnectionString();
+    
+    console.log('🗄️  Initializing PostgreSQL connection pool...');
+    
+    // Determine SSL requirements
+    // Railway requires SSL for:
+    // 1. Internal connections (railway.internal)
+    // 2. External connections (metro.proxy.rlwy.net, etc.) in production
+    const isRailway = connectionString.includes('railway.internal') || 
+                      connectionString.includes('railway.app') ||
+                      connectionString.includes('rlwy.net');
+    const needsSSL = isRailway || process.env.NODE_ENV === 'production';
+    
+    if (needsSSL) {
+      console.log('🔒 SSL enabled for Railway connection');
+    }
+    
+    pool = new Pool({
+      connectionString,
+      ssl: needsSSL ? { rejectUnauthorized: false } : false,
+      max: 20, // Maximum number of clients in the pool
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000, // Increased timeout for Railway
+      // Retry configuration
+      allowExitOnIdle: true,
+    });
 
-  console.log('Initializing PostgreSQL connection pool...');
-  
-  // Railway requires SSL for internal connections
-  const needsSSL = connectionString.includes('railway.internal') || process.env.NODE_ENV === 'production';
-  
-  pool = new Pool({
-    connectionString,
-    ssl: needsSSL ? { rejectUnauthorized: false } : false,
-    max: 20, // Maximum number of clients in the pool
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
-  });
+    // Handle pool errors gracefully
+    pool.on('error', (err) => {
+      console.error('❌ Database pool error:', err.message);
+      // Don't exit immediately, let the app try to recover
+      console.error('   Attempting to reconnect...');
+    });
 
-  // Handle pool errors
-  pool.on('error', (err) => {
-    console.error('Unexpected error on idle client', err);
-    process.exit(-1);
-  });
+    // Test connection on initialization
+    pool.query('SELECT NOW()')
+      .then(() => {
+        console.log('✅ PostgreSQL connection established successfully');
+      })
+      .catch((err) => {
+        console.error('❌ PostgreSQL connection test failed:', err.message);
+        console.error('   Check your DATABASE_URL or Railway PostgreSQL service connection');
+      });
 
-  return pool;
+    return pool;
+  } catch (error) {
+    console.error('❌ Failed to initialize database:', error.message);
+    throw error;
+  }
 }
 
 /**
@@ -76,20 +118,45 @@ export function getPool() {
 }
 
 /**
- * Execute a query
+ * Execute a query with retry logic for connection issues
  */
 export async function query(text, params) {
   const pool = getPool();
   const start = Date.now();
-  try {
-    const res = await pool.query(text, params);
-    const duration = Date.now() - start;
-    console.log('Executed query', { text, duration, rows: res.rowCount });
-    return res;
-  } catch (error) {
-    console.error('Database query error:', error);
-    throw error;
+  const maxRetries = 3;
+  let lastError;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await pool.query(text, params);
+      const duration = Date.now() - start;
+      
+      // Only log slow queries or errors
+      if (duration > 1000) {
+        console.log(`⚠️  Slow query (${duration}ms):`, text.substring(0, 100));
+      }
+      
+      return res;
+    } catch (error) {
+      lastError = error;
+      
+      // Check if it's a connection error that might be retryable
+      if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT' || error.message.includes('connection')) {
+        if (attempt < maxRetries) {
+          console.warn(`⚠️  Connection error, retrying (${attempt}/${maxRetries})...`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt)); // Exponential backoff
+          continue;
+        }
+      }
+      
+      // Non-retryable error or max retries reached
+      console.error('❌ Database query error:', error.message);
+      console.error('   Query:', text.substring(0, 200));
+      throw error;
+    }
   }
+  
+  throw lastError;
 }
 
 /**

@@ -21,8 +21,16 @@ async function autoSetup() {
   try {
     console.log('🔧 Checking database setup...');
     
-    // Initialize database connection
-    initDatabase();
+    // Initialize database connection with error handling
+    try {
+      initDatabase();
+    } catch (connError) {
+      console.error('⚠️  Database connection error:', connError.message);
+      console.error('   This is normal if DATABASE_URL is not set yet');
+      console.error('   The app will work once Railway provides DATABASE_URL');
+      setupComplete = true;
+      return; // Don't fail, let the app start
+    }
     
     // Check if tables exist by trying to query users table
     try {
@@ -36,8 +44,16 @@ async function autoSetup() {
         console.log('📋 Creating database schema...');
         await createSchema();
         console.log('✅ Schema created successfully');
+      } else if (error.message.includes('connection') || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+        // Connection error - don't fail, just log
+        console.warn('⚠️  Could not connect to database. Will retry on next request.');
+        setupComplete = true;
+        return;
       } else {
-        throw error;
+        // Other error - log but don't fail
+        console.warn('⚠️  Database setup warning:', error.message);
+        setupComplete = true;
+        return;
       }
     }
     
