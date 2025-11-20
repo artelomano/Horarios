@@ -300,6 +300,8 @@ app.post('/api/vacations', requireAuth, async (req, res) => {
 });
 
 // Serve test-app directory for subdirectory testing
+// Serve static files (images, etc.)
+app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 app.use('/test-app', express.static(path.join(__dirname, 'test-app')));
 
 // Serve static files from React build in production

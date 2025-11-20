@@ -20,17 +20,24 @@ export const EMPLOYEE_TYPES = {
   SERVICE: 'service',
 };
 
-// Color palette
+// Color palette - Clínica Dental Jerez
 export const COLORS = {
-  white: '#fff',
-  black: '#000',
-  primary: '#005B52',
-  secondary: '#1E1E1E',
-  darkGreen: '#005B52',
-  lightGreen: '#04BF8A',
-  darkYellow: '#C1D711',
-  lightYellow: '#DBF226',
-  lightGrey: '#B3B3B3',
+  white: '#FFFFFF',
+  black: '#000000',
+  primary: '#000000',
+  secondary: '#09141E',
+  text: '#5D5D5D',
+  accent: '#B9B9B9',
+  lightBg: '#F8F9F8',
+  accentGreen: '#C5FA2D',
+  darkBlue: '#012D3A',
+  turquoise: '#007E8E',
+  lightBlue: '#E2F8FF',
+  blue: '#0B71D9',
+  teal: '#5F8489',
+  mint: '#84BBA4',
+  // Legacy support
+  lightGrey: '#B9B9B9',
 };
 
 // Default employee colors

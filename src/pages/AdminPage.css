@@ -1,10 +1,10 @@
 .admin-container {
   min-height: 100vh;
-  background-color: var(--color-white);
+  background-color: var(--color-light-bg);
 }
 
 .admin-header {
-  background-color: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   color: var(--color-white);
   padding: 1.5rem 2rem;
   display: flex;
@@ -12,11 +12,30 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.admin-header-content {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.admin-logo {
+  height: 40px;
+  width: auto;
 }
 
 .admin-header h1 {
   color: var(--color-white);
   margin: 0;
+  font-family: var(--font-archivo);
+  font-weight: 500;
+  font-size: 1.5rem;
+  letter-spacing: -0.5px;
 }
 
 .header-actions {
@@ -28,6 +47,7 @@
 .header-actions .btn-secondary {
   border-color: var(--color-white);
   color: var(--color-white);
+  background-color: transparent;
 }
 
 .header-actions .btn-secondary:hover {
@@ -39,5 +59,7 @@
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
+  background-color: var(--color-white);
+  min-height: calc(100vh - 80px);
 }
 

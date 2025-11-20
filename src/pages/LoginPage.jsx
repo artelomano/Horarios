@@ -27,6 +27,9 @@ function LoginPage({ onLogin }) {
   return (
     <div className="login-container">
       <div className="login-box">
+        <div className="login-logo">
+          <img src="/images/logo-clinica-dental-jerez.png" alt="Clínica Dental Jerez" onError={(e) => { e.target.style.display = 'none'; }} />
+        </div>
         <h1>Gestor de Horarios</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group">

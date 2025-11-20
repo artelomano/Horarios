@@ -46,6 +46,7 @@ function PublicPage() {
   return (
     <div className="public-container">
       <header className="public-header">
+        <img src="/images/logo-clinica-dental-jerez.png" alt="Clínica Dental Jerez" className="public-logo" onError={(e) => { e.target.style.display = 'none'; }} />
         <h1>Horarios de la Clínica</h1>
         <p>Vista pública - Solo lectura</p>
       </header>

@@ -93,7 +93,10 @@ function AdminPage({ onLogout }) {
   return (
     <div className="admin-container">
       <header className="admin-header">
-        <h1>Gestor de Horarios</h1>
+        <div className="admin-header-content">
+          <img src="/images/logo-clinica-dental-jerez.png" alt="Clínica Dental Jerez" className="admin-logo" onError={(e) => { e.target.style.display = 'none'; }} />
+          <h1>Gestor de Horarios</h1>
+        </div>
         <div className="header-actions">
           <button
             className={`btn-secondary ${currentView === 'calendar' ? 'active' : ''}`}

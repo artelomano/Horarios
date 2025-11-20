@@ -1,7 +1,9 @@
 /**
  * Global Styles
- * Based on menestystarinat.fi design system
+ * Based on Clínica Dental Jerez design system
  */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700&display=swap');
 
 * {
   margin: 0;
@@ -10,23 +12,44 @@
 }
 
 :root {
-  --color-white: #fff;
-  --color-black: #000;
-  --color-primary: #005B52;
-  --color-secondary: #1E1E1E;
-  --color-dark-green: #005B52;
-  --color-light-green: #04BF8A;
-  --color-dark-yellow: #C1D711;
-  --color-light-yellow: #DBF226;
-  --color-light-grey: #B3B3B3;
-  --font-montserrat: 'Montserrat', sans-serif;
+  /* Primary Colors */
+  --color-primary: #000000;
+  --color-secondary: #09141E;
+  --color-text: #5D5D5D;
+  --color-accent: #B9B9B9;
+  --color-white: #FFFFFF;
+  --color-light-bg: #F8F9F8;
+  
+  /* Accent Colors */
+  --color-accent-green: #C5FA2D;
+  --color-dark-blue: #012D3A;
+  --color-turquoise: #007E8E;
+  --color-light-blue: #E2F8FF;
+  --color-blue: #0B71D9;
+  --color-teal: #5F8489;
+  --color-mint: #84BBA4;
+  
+  /* Legacy support */
+  --color-black: #000000;
+  --color-light-grey: #B9B9B9;
+  
+  /* Typography */
+  --font-archivo: 'Archivo', sans-serif;
+  --font-primary: var(--font-archivo);
+  --font-size-primary: 68px;
+  --font-size-secondary: 54px;
+  --font-weight-primary: 500;
+  --font-weight-secondary: 500;
+  --line-height-primary: 1.3em;
+  --letter-spacing-primary: -1px;
 }
 
 body {
-  font-family: var(--font-montserrat);
+  font-family: var(--font-archivo);
   background-color: var(--color-white);
-  color: var(--color-black);
+  color: var(--color-primary);
   line-height: 1.6;
+  font-weight: 400;
 }
 
 /* Button Styles */
@@ -36,37 +59,41 @@ body {
   border: none;
   padding: 12px 24px;
   border-radius: 4px;
-  font-family: var(--font-montserrat);
+  font-family: var(--font-archivo);
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .btn-primary:hover {
-  background-color: var(--color-dark-green);
+  background-color: var(--color-secondary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .btn-secondary {
   background-color: transparent;
-  color: var(--color-black);
-  border: 2px solid var(--color-black);
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
   padding: 10px 22px;
   border-radius: 4px;
-  font-family: var(--font-montserrat);
+  font-family: var(--font-archivo);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .btn-secondary:hover {
-  background-color: var(--color-black);
+  background-color: var(--color-primary);
   color: var(--color-white);
 }
 
 .btn-secondary.active {
-  background-color: var(--color-primary);
+  background-color: var(--color-turquoise);
   color: var(--color-white);
-  border-color: var(--color-primary);
+  border-color: var(--color-turquoise);
 }
 
 .btn-icon {
@@ -102,10 +129,20 @@ body {
 .form-group textarea {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid var(--color-light-grey);
+  border: 1px solid var(--color-accent);
   border-radius: 4px;
-  font-family: var(--font-montserrat);
+  font-family: var(--font-archivo);
   font-size: 1rem;
+  color: var(--color-text);
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-turquoise);
+  box-shadow: 0 0 0 2px var(--color-light-blue);
 }
 
 .form-group textarea {
@@ -163,12 +200,39 @@ body {
   padding: 0.75rem;
   border-radius: 4px;
   margin-bottom: 1rem;
+  font-family: var(--font-archivo);
+  font-weight: 500;
 }
 
 /* Info Text */
 .info-text {
-  color: var(--color-secondary);
+  color: var(--color-text);
   font-size: 0.9rem;
   margin-bottom: 1.5rem;
+  font-family: var(--font-archivo);
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-archivo);
+  font-weight: 500;
+  color: var(--color-primary);
+  line-height: 1.3em;
+  letter-spacing: -0.5px;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 500;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 500;
 }
 
